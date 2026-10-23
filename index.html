@@ -1,12 +1,71 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>Joelyson</title></head>
-<body style="font-family:Arial; background:#0f172a; color:white; text-align:center; padding:50px">
-<h1 style="color:#38bdf8">Joelyson Issacar 🚀</h1>
-<p>Meu primeiro projeto no GitHub</p>
-<div style="background:white; color:black; padding:30px; border-radius:20px; max-width:500px; margin:30px auto">
-<h2>Aprendi Git e GitHub!</h2>
-<p>Santa Luzia do Paruá - MA</p>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Controle Financeiro</title>
+<style>
+ body { font-family: Arial; max-width: 600px; margin: 20px auto; padding: 15px; background: #f5f5f5; }
+ .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+ input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
+ button { background: #007bff; color: white; border: none; cursor: pointer; }
+ .item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee; }
+</style>
+</head>
+<body>
+
+<div class="card">
+ <h2>💰 Controle Financeiro</h2>
+ <input id="desc" placeholder="Descrição">
+ <input id="valor" type="number" placeholder="Valor">
+ <select id="tipo"><option value="entrada">Entrada</option><option value="saida">Saída</option></select>
+ <button onclick="adicionar()">Adicionar</button>
 </div>
+
+<div class="card">
+ <div>Entradas: <b id="entradas">R$ 0</b></div>
+ <div>Saídas: <b id="saidas">R$ 0</b></div>
+ <div>Saldo: <b id="saldo">R$ 0</b></div>
+</div>
+
+<div class="card" id="lista"></div>
+
+<script>
+let transacoes = JSON.parse(localStorage.getItem('transacoes') || '[]');
+
+function adicionar(){
+ let d = document.getElementById('desc').value;
+ let v = parseFloat(document.getElementById('valor').value);
+ let t = document.getElementById('tipo').value;
+ if(!d || !v) return alert('Preencha tudo!');
+ transacoes.push({id: Date.now(), desc: d, valor: v, tipo: t});
+ localStorage.setItem('transacoes', JSON.stringify(transacoes));
+ document.getElementById('desc').value = '';
+ document.getElementById('valor').value = '';
+ atualizar();
+}
+
+function remover(id){
+ transacoes = transacoes.filter(x => x.id !== id);
+ localStorage.setItem('transacoes', JSON.stringify(transacoes));
+ atualizar();
+}
+
+function atualizar(){
+ let e=0,s=0;
+ let lista=document.getElementById('lista');
+ lista.innerHTML='<h3 style="margin-bottom:15px">Transações</h3>';
+ transacoes.forEach(tr=>{
+  if(tr.tipo==='entrada') e+=tr.valor; else s+=tr.valor;
+  let div=document.createElement('div'); div.className='item';
+  div.innerHTML=`<span>${tr.desc}</span><span style="color:${tr.tipo==='entrada'?'green':'red'}">R$ ${tr.valor} <button onclick="remover(${tr.id})">X</button></span>`;
+  lista.appendChild(div);
+ });
+ document.getElementById('entradas').innerText='R$ '+e.toFixed(2);
+ document.getElementById('saidas').innerText='R$ '+s.toFixed(2);
+ document.getElementById('saldo').innerText='R$ '+(e-s).toFixed(2);
+}
+atualizar();
+</script>
 </body>
 </html>
